@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#MISE hide=true
 #MISE description="Run Cedar authorization test cases"
 #MISE depends=["cedar:validate"]
 
