@@ -1,0 +1,8 @@
+[tools]
+buf = "1"
+go = "1"
+"go:connectrpc.com/connect/cmd/protoc-gen-connect-go" = "1"
+"go:golang.org/x/tools/cmd/goimports" = "0"
+"go:google.golang.org/protobuf/cmd/protoc-gen-go" = "1"
+jwt = "latest"
+pocketbase = "0"
