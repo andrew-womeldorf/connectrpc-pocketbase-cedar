@@ -1,0 +1,218 @@
+[
+    {
+        "name": "any user can create a book",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"CreateBook\"",
+            "resource": "Book::\"new-book\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "new-book" },
+                "attrs": { "author": "", "status": "" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-create-book"],
+        "num_errors": 0
+    },
+    {
+        "name": "any user can get a published book",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"GetBook\"",
+            "resource": "Book::\"published-book\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "published-book" },
+                "attrs": { "author": "user1", "status": "published" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-get-published-book"],
+        "num_errors": 0
+    },
+    {
+        "name": "author can get own draft",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"GetBook\"",
+            "resource": "Book::\"draft-book-user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-get-own-draft"],
+        "num_errors": 0
+    },
+    {
+        "name": "non-author cannot get someone else's draft",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"GetBook\"",
+            "resource": "Book::\"draft-book-user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "any user can list books",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"ListBooks\"",
+            "resource": "Book::\"any-book\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "any-book" },
+                "attrs": { "author": "user1", "status": "published" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-list-books"],
+        "num_errors": 0
+    },
+    {
+        "name": "author can update own book",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"UpdateBook\"",
+            "resource": "Book::\"draft-book-user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-update-own-book"],
+        "num_errors": 0
+    },
+    {
+        "name": "non-author cannot update someone else's book",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"UpdateBook\"",
+            "resource": "Book::\"draft-book-user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "author can delete own book",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"DeleteBook\"",
+            "resource": "Book::\"draft-book-user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-delete-own-book"],
+        "num_errors": 0
+    },
+    {
+        "name": "non-author cannot delete someone else's book",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"DeleteBook\"",
+            "resource": "Book::\"draft-book-user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    }
+]

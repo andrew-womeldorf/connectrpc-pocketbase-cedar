@@ -1,0 +1,23 @@
+entity User {
+    id: String,
+};
+
+entity Book {
+    author: String,
+    status: String,
+};
+
+action "CreateBook"
+    appliesTo { principal: [User], resource: [Book] };
+
+action "GetBook"
+    appliesTo { principal: [User], resource: [Book] };
+
+action "ListBooks"
+    appliesTo { principal: [User], resource: [Book] };
+
+action "UpdateBook"
+    appliesTo { principal: [User], resource: [Book] };
+
+action "DeleteBook"
+    appliesTo { principal: [User], resource: [Book] };

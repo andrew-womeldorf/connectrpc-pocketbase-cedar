@@ -19,7 +19,7 @@ import (
 	_ "gitlab.com/andrew.womeldorf/pbtest/migrations"
 )
 
-//go:embed policies/policies.cedar
+//go:embed policies/policy.cedar
 var policiesFS embed.FS
 
 func main() {

@@ -22,7 +22,7 @@ const userIDKey contextKey = "userID"
 var policySet *cedar.PolicySet
 
 func LoadPolicies(policyFS fs.FS) {
-	data, err := fs.ReadFile(policyFS, "policies/policies.cedar")
+	data, err := fs.ReadFile(policyFS, "policies/policy.cedar")
 	if err != nil {
 		log.Fatalf("Failed to read Cedar policies: %v", err)
 	}
