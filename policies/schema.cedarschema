@@ -1,7 +1,14 @@
 namespace Library {
     entity User {
         id: String,
+        verified: Bool,
     };
+
+    action "GetMe"
+        appliesTo { principal: [User], resource: [User] };
+
+    action "UpdateMe"
+        appliesTo { principal: [User], resource: [User] };
 
     entity Book {
         author: String,

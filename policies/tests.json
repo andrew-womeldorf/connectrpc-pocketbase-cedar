@@ -1,20 +1,20 @@
 [
     {
-        "name": "any user can create a book",
+        "name": "verified user can create a book",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"CreateBook\"",
-            "resource": "Book::\"new-book\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"CreateBook\"",
+            "resource": "Library::Book::\"new-book\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": true },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "new-book" },
+                "uid": { "type": "Library::Book", "id": "new-book" },
                 "attrs": { "author": "", "status": "" },
                 "parents": []
             }
@@ -24,21 +24,45 @@
         "num_errors": 0
     },
     {
-        "name": "any user can get a published book",
+        "name": "unverified user cannot create a book",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"GetBook\"",
-            "resource": "Book::\"published-book\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"CreateBook\"",
+            "resource": "Library::Book::\"new-book\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "published-book" },
+                "uid": { "type": "Library::Book", "id": "new-book" },
+                "attrs": { "author": "", "status": "" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "any user can get a published book",
+        "request": {
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"GetBook\"",
+            "resource": "Library::Book::\"published-book\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::Book", "id": "published-book" },
                 "attrs": { "author": "user1", "status": "published" },
                 "parents": []
             }
@@ -50,19 +74,19 @@
     {
         "name": "author can get own draft",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"GetBook\"",
-            "resource": "Book::\"draft-book-user1\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"GetBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
                 "attrs": { "author": "user1", "status": "draft" },
                 "parents": []
             }
@@ -74,19 +98,19 @@
     {
         "name": "non-author cannot get someone else's draft",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"GetBook\"",
-            "resource": "Book::\"draft-book-user1\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"GetBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
                 "attrs": { "author": "user1", "status": "draft" },
                 "parents": []
             }
@@ -98,19 +122,19 @@
     {
         "name": "any user can list books",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"ListBooks\"",
-            "resource": "Book::\"any-book\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"ListBooks\"",
+            "resource": "Library::Book::\"any-book\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "any-book" },
+                "uid": { "type": "Library::Book", "id": "any-book" },
                 "attrs": { "author": "user1", "status": "published" },
                 "parents": []
             }
@@ -120,21 +144,21 @@
         "num_errors": 0
     },
     {
-        "name": "author can update own book",
+        "name": "verified author can update own book",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"UpdateBook\"",
-            "resource": "Book::\"draft-book-user1\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"UpdateBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": true },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
                 "attrs": { "author": "user1", "status": "draft" },
                 "parents": []
             }
@@ -144,21 +168,21 @@
         "num_errors": 0
     },
     {
-        "name": "non-author cannot update someone else's book",
+        "name": "unverified author cannot update own book",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"UpdateBook\"",
-            "resource": "Book::\"draft-book-user1\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"UpdateBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
                 "attrs": { "author": "user1", "status": "draft" },
                 "parents": []
             }
@@ -168,21 +192,45 @@
         "num_errors": 0
     },
     {
-        "name": "author can delete own book",
+        "name": "non-author cannot update someone else's book",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"DeleteBook\"",
-            "resource": "Book::\"draft-book-user1\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"UpdateBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": true },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "verified author can delete own book",
+        "request": {
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"DeleteBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": true },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
                 "attrs": { "author": "user1", "status": "draft" },
                 "parents": []
             }
@@ -192,21 +240,21 @@
         "num_errors": 0
     },
     {
-        "name": "non-author cannot delete someone else's book",
+        "name": "unverified author cannot delete own book",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"DeleteBook\"",
-            "resource": "Book::\"draft-book-user1\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"DeleteBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Book", "id": "draft-book-user1" },
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
                 "attrs": { "author": "user1", "status": "draft" },
                 "parents": []
             }
@@ -216,21 +264,45 @@
         "num_errors": 0
     },
     {
-        "name": "any user can create a review on someone else's book",
+        "name": "non-author cannot delete someone else's book",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"CreateReview\"",
-            "resource": "Review::\"new-review\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"DeleteBook\"",
+            "resource": "Library::Book::\"draft-book-user1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": true },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "new-review" },
+                "uid": { "type": "Library::Book", "id": "draft-book-user1" },
+                "attrs": { "author": "user1", "status": "draft" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "verified user can create a review on someone else's book",
+        "request": {
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"CreateReview\"",
+            "resource": "Library::Review::\"new-review\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": true },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::Review", "id": "new-review" },
                 "attrs": { "reviewer": "user2", "book_author": "user1" },
                 "parents": []
             }
@@ -240,21 +312,45 @@
         "num_errors": 0
     },
     {
-        "name": "author cannot review own book",
+        "name": "unverified user cannot create a review",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"CreateReview\"",
-            "resource": "Review::\"self-review\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"CreateReview\"",
+            "resource": "Library::Review::\"new-review\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "self-review" },
+                "uid": { "type": "Library::Review", "id": "new-review" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "author cannot review own book",
+        "request": {
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"CreateReview\"",
+            "resource": "Library::Review::\"self-review\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": true },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::Review", "id": "self-review" },
                 "attrs": { "reviewer": "user1", "book_author": "user1" },
                 "parents": []
             }
@@ -266,19 +362,19 @@
     {
         "name": "any user can get a review",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"GetReview\"",
-            "resource": "Review::\"review1\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"GetReview\"",
+            "resource": "Library::Review::\"review1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "review1" },
+                "uid": { "type": "Library::Review", "id": "review1" },
                 "attrs": { "reviewer": "user1", "book_author": "user1" },
                 "parents": []
             }
@@ -290,19 +386,19 @@
     {
         "name": "any user can list reviews",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"ListReviews\"",
-            "resource": "Review::\"any-review\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"ListReviews\"",
+            "resource": "Library::Review::\"any-review\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "any-review" },
+                "uid": { "type": "Library::Review", "id": "any-review" },
                 "attrs": { "reviewer": "user2", "book_author": "user1" },
                 "parents": []
             }
@@ -312,21 +408,21 @@
         "num_errors": 0
     },
     {
-        "name": "reviewer can update own review",
+        "name": "verified reviewer can update own review",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"UpdateReview\"",
-            "resource": "Review::\"review1\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"UpdateReview\"",
+            "resource": "Library::Review::\"review1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": true },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "review1" },
+                "uid": { "type": "Library::Review", "id": "review1" },
                 "attrs": { "reviewer": "user2", "book_author": "user1" },
                 "parents": []
             }
@@ -336,21 +432,21 @@
         "num_errors": 0
     },
     {
-        "name": "non-reviewer cannot update review",
+        "name": "unverified reviewer cannot update own review",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"UpdateReview\"",
-            "resource": "Review::\"review1\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"UpdateReview\"",
+            "resource": "Library::Review::\"review1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "review1" },
+                "uid": { "type": "Library::Review", "id": "review1" },
                 "attrs": { "reviewer": "user2", "book_author": "user1" },
                 "parents": []
             }
@@ -360,21 +456,45 @@
         "num_errors": 0
     },
     {
-        "name": "reviewer can delete own review",
+        "name": "non-reviewer cannot update review",
         "request": {
-            "principal": "User::\"user2\"",
-            "action": "Action::\"DeleteReview\"",
-            "resource": "Review::\"review1\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"UpdateReview\"",
+            "resource": "Library::Review::\"review1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user2" },
-                "attrs": { "id": "user2" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": true },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "review1" },
+                "uid": { "type": "Library::Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "verified reviewer can delete own review",
+        "request": {
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"DeleteReview\"",
+            "resource": "Library::Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": true },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::Review", "id": "review1" },
                 "attrs": { "reviewer": "user2", "book_author": "user1" },
                 "parents": []
             }
@@ -384,21 +504,45 @@
         "num_errors": 0
     },
     {
-        "name": "book author can moderate (delete) review",
+        "name": "unverified reviewer cannot delete own review",
         "request": {
-            "principal": "User::\"user1\"",
-            "action": "Action::\"DeleteReview\"",
-            "resource": "Review::\"review1\"",
+            "principal": "Library::User::\"user2\"",
+            "action": "Library::Action::\"DeleteReview\"",
+            "resource": "Library::Review::\"review1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user1" },
-                "attrs": { "id": "user1" },
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "review1" },
+                "uid": { "type": "Library::Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "verified book author can moderate (delete) review",
+        "request": {
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"DeleteReview\"",
+            "resource": "Library::Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": true },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::Review", "id": "review1" },
                 "attrs": { "reviewer": "user2", "book_author": "user1" },
                 "parents": []
             }
@@ -408,22 +552,132 @@
         "num_errors": 0
     },
     {
-        "name": "unrelated user cannot delete review",
+        "name": "unverified book author cannot moderate (delete) review",
         "request": {
-            "principal": "User::\"user3\"",
-            "action": "Action::\"DeleteReview\"",
-            "resource": "Review::\"review1\"",
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"DeleteReview\"",
+            "resource": "Library::Review::\"review1\"",
             "context": {}
         },
         "entities": [
             {
-                "uid": { "type": "User", "id": "user3" },
-                "attrs": { "id": "user3" },
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
                 "parents": []
             },
             {
-                "uid": { "type": "Review", "id": "review1" },
+                "uid": { "type": "Library::Review", "id": "review1" },
                 "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "unrelated user cannot delete review",
+        "request": {
+            "principal": "Library::User::\"user3\"",
+            "action": "Library::Action::\"DeleteReview\"",
+            "resource": "Library::Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user3" },
+                "attrs": { "id": "user3", "verified": true },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "user can get own profile",
+        "request": {
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"GetMe\"",
+            "resource": "Library::User::\"user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-get-me"],
+        "num_errors": 0
+    },
+    {
+        "name": "user cannot get another user's profile",
+        "request": {
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"GetMe\"",
+            "resource": "Library::User::\"user2\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "user can update own profile",
+        "request": {
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"UpdateMe\"",
+            "resource": "Library::User::\"user1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-update-me"],
+        "num_errors": 0
+    },
+    {
+        "name": "user cannot update another user's profile",
+        "request": {
+            "principal": "Library::User::\"user1\"",
+            "action": "Library::Action::\"UpdateMe\"",
+            "resource": "Library::User::\"user2\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "Library::User", "id": "user1" },
+                "attrs": { "id": "user1", "verified": false },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Library::User", "id": "user2" },
+                "attrs": { "id": "user2", "verified": false },
                 "parents": []
             }
         ],
