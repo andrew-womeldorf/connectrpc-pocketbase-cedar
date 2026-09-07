@@ -214,5 +214,221 @@
         "decision": "deny",
         "reason": [],
         "num_errors": 0
+    },
+    {
+        "name": "any user can create a review on someone else's book",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"CreateReview\"",
+            "resource": "Review::\"new-review\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "new-review" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-create-review"],
+        "num_errors": 0
+    },
+    {
+        "name": "author cannot review own book",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"CreateReview\"",
+            "resource": "Review::\"self-review\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "self-review" },
+                "attrs": { "reviewer": "user1", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "any user can get a review",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"GetReview\"",
+            "resource": "Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "review1" },
+                "attrs": { "reviewer": "user1", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-get-review"],
+        "num_errors": 0
+    },
+    {
+        "name": "any user can list reviews",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"ListReviews\"",
+            "resource": "Review::\"any-review\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "any-review" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-list-reviews"],
+        "num_errors": 0
+    },
+    {
+        "name": "reviewer can update own review",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"UpdateReview\"",
+            "resource": "Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-update-own-review"],
+        "num_errors": 0
+    },
+    {
+        "name": "non-reviewer cannot update review",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"UpdateReview\"",
+            "resource": "Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
+    },
+    {
+        "name": "reviewer can delete own review",
+        "request": {
+            "principal": "User::\"user2\"",
+            "action": "Action::\"DeleteReview\"",
+            "resource": "Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user2" },
+                "attrs": { "id": "user2" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-delete-own-review"],
+        "num_errors": 0
+    },
+    {
+        "name": "book author can moderate (delete) review",
+        "request": {
+            "principal": "User::\"user1\"",
+            "action": "Action::\"DeleteReview\"",
+            "resource": "Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user1" },
+                "attrs": { "id": "user1" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "allow",
+        "reason": ["allow-moderate-review"],
+        "num_errors": 0
+    },
+    {
+        "name": "unrelated user cannot delete review",
+        "request": {
+            "principal": "User::\"user3\"",
+            "action": "Action::\"DeleteReview\"",
+            "resource": "Review::\"review1\"",
+            "context": {}
+        },
+        "entities": [
+            {
+                "uid": { "type": "User", "id": "user3" },
+                "attrs": { "id": "user3" },
+                "parents": []
+            },
+            {
+                "uid": { "type": "Review", "id": "review1" },
+                "attrs": { "reviewer": "user2", "book_author": "user1" },
+                "parents": []
+            }
+        ],
+        "decision": "deny",
+        "reason": [],
+        "num_errors": 0
     }
 ]

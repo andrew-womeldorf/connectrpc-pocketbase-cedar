@@ -10,6 +10,12 @@ service LibraryService {
   rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
   rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
+
+  rpc CreateReview(CreateReviewRequest) returns (CreateReviewResponse);
+  rpc GetReview(GetReviewRequest) returns (GetReviewResponse);
+  rpc ListReviews(ListReviewsRequest) returns (ListReviewsResponse);
+  rpc UpdateReview(UpdateReviewRequest) returns (UpdateReviewResponse);
+  rpc DeleteReview(DeleteReviewRequest) returns (DeleteReviewResponse);
 }
 
 message Book {
@@ -58,3 +64,55 @@ message DeleteBookRequest {
 }
 
 message DeleteBookResponse {}
+
+message Review {
+  string id = 1;
+  string book_id = 2;
+  string reviewer = 3;
+  string content = 4;
+  int32 rating = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message CreateReviewRequest {
+  string book_id = 1;
+  string content = 2;
+  int32 rating = 3;
+}
+
+message CreateReviewResponse {
+  Review review = 1;
+}
+
+message GetReviewRequest {
+  string id = 1;
+}
+
+message GetReviewResponse {
+  Review review = 1;
+}
+
+message ListReviewsRequest {
+  string book_id = 1;
+}
+
+message ListReviewsResponse {
+  repeated Review reviews = 1;
+}
+
+message UpdateReviewRequest {
+  string id = 1;
+  string content = 2;
+  int32 rating = 3;
+}
+
+message UpdateReviewResponse {
+  Review review = 1;
+}
+
+message DeleteReviewRequest {
+  string id = 1;
+}
+
+message DeleteReviewResponse {}

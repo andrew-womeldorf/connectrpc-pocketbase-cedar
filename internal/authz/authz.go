@@ -11,8 +11,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/cedar-policy/cedar-go"
 	"github.com/pocketbase/pocketbase/core"
-
-	libraryv1 "gitlab.com/andrew.womeldorf/pbtest/gen/library/v1"
 )
 
 type contextKey string
@@ -38,6 +36,35 @@ func UserIDFromContext(ctx context.Context) string {
 	return id
 }
 
+func Authorize(userID, action string, resourceUID cedar.EntityUID, entities cedar.EntityMap) error {
+	principalUID := cedar.EntityUID{Type: "User", ID: cedar.String(userID)}
+
+	entities[principalUID] = cedar.Entity{
+		UID: principalUID,
+		Attributes: cedar.NewRecord(cedar.RecordMap{
+			"id": cedar.String(userID),
+		}),
+	}
+
+	req := cedar.Request{
+		Principal: principalUID,
+		Action:    cedar.EntityUID{Type: "Action", ID: cedar.String(action)},
+		Resource:  resourceUID,
+	}
+
+	slog.Info("cedar authz", slog.Any("request", req), slog.Any("entities", entities))
+	decision, diagnostic := policySet.IsAuthorized(entities, req)
+	slog.Info("cedar decision", slog.Any("decision", decision), slog.Any("diagnostic", diagnostic))
+
+	if decision != cedar.Allow {
+		return connect.NewError(connect.CodePermissionDenied, errors.New("cedar policy denied access"))
+	}
+	return nil
+}
+
+// Interceptor returns a ConnectRPC interceptor that handles authentication.
+// It validates the Bearer token, extracts the user ID, and stores it in context.
+// Authorization is handled per-handler via the Authorize function.
 func Interceptor(app core.App) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
@@ -51,64 +78,8 @@ func Interceptor(app core.App) connect.UnaryInterceptorFunc {
 			if err != nil {
 				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("invalid token"))
 			}
-			userID := userRecord.Id
 
-			procedure := req.Spec().Procedure
-			actionName := procedure[strings.LastIndex(procedure, "/")+1:]
-
-			var resourceID string
-			switch msg := req.Any().(type) {
-			case *libraryv1.GetBookRequest:
-				resourceID = msg.GetId()
-			case *libraryv1.UpdateBookRequest:
-				resourceID = msg.GetId()
-			case *libraryv1.DeleteBookRequest:
-				resourceID = msg.GetId()
-			}
-
-			bookAuthor := ""
-			bookStatus := ""
-			if resourceID != "" {
-				if book, err := app.FindRecordById("books", resourceID); err == nil {
-					bookAuthor = book.GetString("author")
-					bookStatus = book.GetString("status")
-				}
-			}
-
-			principalUID := cedar.EntityUID{Type: "User", ID: cedar.String(userID)}
-			actionUID := cedar.EntityUID{Type: "Action", ID: cedar.String(actionName)}
-			resourceUID := cedar.EntityUID{Type: "Book", ID: cedar.String(resourceID)}
-
-			entities := cedar.EntityMap{
-				principalUID: cedar.Entity{
-					UID: principalUID,
-					Attributes: cedar.NewRecord(cedar.RecordMap{
-						"id": cedar.String(userID),
-					}),
-				},
-				resourceUID: cedar.Entity{
-					UID: resourceUID,
-					Attributes: cedar.NewRecord(cedar.RecordMap{
-						"author": cedar.String(bookAuthor),
-						"status": cedar.String(bookStatus),
-					}),
-				},
-			}
-
-			cedarReq := cedar.Request{
-				Principal: principalUID,
-				Action:    actionUID,
-				Resource:  resourceUID,
-			}
-
-			slog.Info("cedar authz", slog.Any("request", cedarReq), slog.Any("entities", entities))
-			decision, diagnostic := policySet.IsAuthorized(entities, cedarReq)
-			slog.Info("cedar decision", slog.Any("decision", decision), slog.Any("diagnostic", diagnostic))
-			if decision != cedar.Allow {
-				return nil, connect.NewError(connect.CodePermissionDenied, errors.New("cedar policy denied access"))
-			}
-
-			ctx = context.WithValue(ctx, userIDKey, userID)
+			ctx = context.WithValue(ctx, userIDKey, userRecord.Id)
 			return next(ctx, req)
 		}
 	}

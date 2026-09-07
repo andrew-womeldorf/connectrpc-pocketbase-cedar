@@ -21,3 +21,23 @@ action "UpdateBook"
 
 action "DeleteBook"
     appliesTo { principal: [User], resource: [Book] };
+
+entity Review {
+    reviewer: String,
+    book_author: String,
+};
+
+action "CreateReview"
+    appliesTo { principal: [User], resource: [Review] };
+
+action "GetReview"
+    appliesTo { principal: [User], resource: [Review] };
+
+action "ListReviews"
+    appliesTo { principal: [User], resource: [Review] };
+
+action "UpdateReview"
+    appliesTo { principal: [User], resource: [Review] };
+
+action "DeleteReview"
+    appliesTo { principal: [User], resource: [Review] };

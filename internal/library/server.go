@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"github.com/cedar-policy/cedar-go"
 	"github.com/pocketbase/pocketbase/core"
 
 	"gitlab.com/andrew.womeldorf/pbtest/gen/library/v1/libraryv1connect"
@@ -30,7 +31,28 @@ func bookFromRecord(r *core.Record) *libraryv1.Book {
 	}
 }
 
+func bookEntities(bookID, bookAuthor, bookStatus string) (cedar.EntityUID, cedar.EntityMap) {
+	resourceUID := cedar.EntityUID{Type: "Book", ID: cedar.String(bookID)}
+	entities := cedar.EntityMap{
+		resourceUID: cedar.Entity{
+			UID: resourceUID,
+			Attributes: cedar.NewRecord(cedar.RecordMap{
+				"author": cedar.String(bookAuthor),
+				"status": cedar.String(bookStatus),
+			}),
+		},
+	}
+	return resourceUID, entities
+}
+
 func (s *Server) CreateBook(ctx context.Context, req *connect.Request[libraryv1.CreateBookRequest]) (*connect.Response[libraryv1.CreateBookResponse], error) {
+	userID := authz.UserIDFromContext(ctx)
+
+	resourceUID, entities := bookEntities("", "", "")
+	if err := authz.Authorize(userID, "CreateBook", resourceUID, entities); err != nil {
+		return nil, err
+	}
+
 	collection, err := s.app.FindCollectionByNameOrId("books")
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -38,7 +60,7 @@ func (s *Server) CreateBook(ctx context.Context, req *connect.Request[libraryv1.
 
 	record := core.NewRecord(collection)
 	record.Set("title", req.Msg.GetTitle())
-	record.Set("author", authz.UserIDFromContext(ctx))
+	record.Set("author", userID)
 	record.Set("status", "draft")
 
 	if err := s.app.Save(record); err != nil {
@@ -56,6 +78,12 @@ func (s *Server) GetBook(ctx context.Context, req *connect.Request[libraryv1.Get
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 
+	userID := authz.UserIDFromContext(ctx)
+	resourceUID, entities := bookEntities(record.Id, record.GetString("author"), record.GetString("status"))
+	if err := authz.Authorize(userID, "GetBook", resourceUID, entities); err != nil {
+		return nil, err
+	}
+
 	return connect.NewResponse(&libraryv1.GetBookResponse{
 		Book: bookFromRecord(record),
 	}), nil
@@ -63,6 +91,11 @@ func (s *Server) GetBook(ctx context.Context, req *connect.Request[libraryv1.Get
 
 func (s *Server) ListBooks(ctx context.Context, req *connect.Request[libraryv1.ListBooksRequest]) (*connect.Response[libraryv1.ListBooksResponse], error) {
 	userID := authz.UserIDFromContext(ctx)
+
+	resourceUID, entities := bookEntities("", "", "")
+	if err := authz.Authorize(userID, "ListBooks", resourceUID, entities); err != nil {
+		return nil, err
+	}
 
 	records, err := s.app.FindAllRecords("books")
 	if err != nil {
@@ -88,6 +121,12 @@ func (s *Server) UpdateBook(ctx context.Context, req *connect.Request[libraryv1.
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 
+	userID := authz.UserIDFromContext(ctx)
+	resourceUID, entities := bookEntities(record.Id, record.GetString("author"), record.GetString("status"))
+	if err := authz.Authorize(userID, "UpdateBook", resourceUID, entities); err != nil {
+		return nil, err
+	}
+
 	if req.Msg.GetTitle() != "" {
 		record.Set("title", req.Msg.GetTitle())
 	}
@@ -108,6 +147,12 @@ func (s *Server) DeleteBook(ctx context.Context, req *connect.Request[libraryv1.
 	record, err := s.app.FindRecordById("books", req.Msg.GetId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeNotFound, err)
+	}
+
+	userID := authz.UserIDFromContext(ctx)
+	resourceUID, entities := bookEntities(record.Id, record.GetString("author"), record.GetString("status"))
+	if err := authz.Authorize(userID, "DeleteBook", resourceUID, entities); err != nil {
+		return nil, err
 	}
 
 	if err := s.app.Delete(record); err != nil {

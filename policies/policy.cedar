@@ -43,3 +43,56 @@ permit (
   resource
 )
 when { resource.author == principal.id };
+
+@id("allow-create-review")
+permit (
+  principal,
+  action == Action::"CreateReview",
+  resource
+);
+
+@id("forbid-self-review")
+forbid (
+  principal,
+  action == Action::"CreateReview",
+  resource
+)
+when { resource.book_author == principal.id };
+
+@id("allow-get-review")
+permit (
+  principal,
+  action == Action::"GetReview",
+  resource
+);
+
+@id("allow-list-reviews")
+permit (
+  principal,
+  action == Action::"ListReviews",
+  resource
+);
+
+@id("allow-update-own-review")
+permit (
+  principal,
+  action == Action::"UpdateReview",
+  resource
+)
+when { resource.reviewer == principal.id };
+
+@id("allow-delete-own-review")
+permit (
+  principal,
+  action == Action::"DeleteReview",
+  resource
+)
+when { resource.reviewer == principal.id };
+
+@id("allow-moderate-review")
+permit (
+  principal,
+  action == Action::"DeleteReview",
+  resource
+)
+when { resource.book_author == principal.id };
