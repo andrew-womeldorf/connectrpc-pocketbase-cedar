@@ -1,0 +1,35 @@
+{{define "title"}}Profile — Library{{end}}
+
+{{define "body"}}
+<section>
+  <h1>Profile</h1>
+
+  <dl>
+    <dt>Email</dt>
+    <dd>{{.Email}}{{if not .Verified}} <em>(unverified)</em>{{end}}</dd>
+    <dt>Name</dt>
+    <dd>{{if .Name}}{{.Name}}{{else}}<em>not set</em>{{end}}</dd>
+  </dl>
+
+  <h2>Change Name</h2>
+  <form method="POST" action="/profile/name">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" value="{{.Name}}" required>
+    <button type="submit">Update Name</button>
+  </form>
+
+  <h2>Change Password</h2>
+  <form method="POST" action="/profile/password">
+    <label for="currentPassword">Current Password</label>
+    <input type="password" id="currentPassword" name="currentPassword" required>
+
+    <label for="newPassword">New Password</label>
+    <input type="password" id="newPassword" name="newPassword" required minlength="8">
+
+    <label for="confirmPassword">Confirm New Password</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+
+    <button type="submit">Change Password</button>
+  </form>
+</section>
+{{end}}

@@ -115,6 +115,10 @@ This is up to pocketbase to do...
 
 [yep, it does](https://github.com/pocketbase/pocketbase/blob/v0.40.3/core/field_password.go#L322)
 
+### Change Password Feature
+
+yep, we did it.
+
 ## Password Storage Cheat Sheet
 
 https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
