@@ -7,8 +7,8 @@ import (
 	"github.com/cedar-policy/cedar-go"
 	"github.com/pocketbase/pocketbase/core"
 
-	"gitlab.com/andrew.womeldorf/pbtest/gen/library/v1/libraryv1connect"
 	libraryv1 "gitlab.com/andrew.womeldorf/pbtest/gen/library/v1"
+	"gitlab.com/andrew.womeldorf/pbtest/gen/library/v1/libraryv1connect"
 	"gitlab.com/andrew.womeldorf/pbtest/internal/authz"
 )
 
