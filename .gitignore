@@ -4,3 +4,4 @@ build
 *.gz
 *.br
 *.zst
+static_hashes.go
