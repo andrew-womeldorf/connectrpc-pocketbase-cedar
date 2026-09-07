@@ -37,8 +37,11 @@ func RegisterRoutes(r *router.Router[*core.RequestEvent], app core.App, s store.
 
 	r.GET("/login", h.loginPage)
 	r.POST("/login", h.loginSubmit)
+	r.GET("/mfa", h.mfaPage)
+	r.POST("/mfa", h.mfaSubmit)
 	r.GET("/register", h.registerPage)
 	r.POST("/register", h.registerSubmit)
+	r.GET("/verify", h.verifySubmit)
 	r.POST("/logout", h.logout)
 
 	auth := r.Group("").BindFunc(h.requireAuth)
@@ -76,6 +79,7 @@ func (h *Handler) requireAuth(e *core.RequestEvent) error {
 
 	e.Set("userID", record.Id)
 	e.Set("userName", record.GetString("name"))
+	e.Set("userVerified", record.Verified())
 	return e.Next()
 }
 
@@ -87,6 +91,8 @@ func (h *Handler) render(e *core.RequestEvent, page string, data pageData) error
 	}
 	data["UserID"] = e.Get("userID")
 	data["UserName"] = e.Get("userName")
+	userVerified, _ := e.Get("userVerified").(bool)
+	data["UserVerified"] = userVerified
 
 	funcMap := template.FuncMap{
 		"stars": func(rating int) string {

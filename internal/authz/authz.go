@@ -15,7 +15,10 @@ import (
 
 type contextKey string
 
-const userIDKey contextKey = "userID"
+const (
+	userIDKey       contextKey = "userID"
+	userVerifiedKey contextKey = "userVerified"
+)
 
 var policySet *cedar.PolicySet
 
@@ -36,13 +39,19 @@ func UserIDFromContext(ctx context.Context) string {
 	return id
 }
 
-func Authorize(userID, action string, resourceUID cedar.EntityUID, entities cedar.EntityMap) error {
+func UserVerifiedFromContext(ctx context.Context) bool {
+	v, _ := ctx.Value(userVerifiedKey).(bool)
+	return v
+}
+
+func Authorize(userID string, userVerified bool, action string, resourceUID cedar.EntityUID, entities cedar.EntityMap) error {
 	principalUID := cedar.EntityUID{Type: "Library::User", ID: cedar.String(userID)}
 
 	entities[principalUID] = cedar.Entity{
 		UID: principalUID,
 		Attributes: cedar.NewRecord(cedar.RecordMap{
-			"id": cedar.String(userID),
+			"id":       cedar.String(userID),
+			"verified": cedar.Boolean(userVerified),
 		}),
 	}
 
@@ -80,6 +89,7 @@ func Interceptor(app core.App) connect.UnaryInterceptorFunc {
 			}
 
 			ctx = context.WithValue(ctx, userIDKey, userRecord.Id)
+			ctx = context.WithValue(ctx, userVerifiedKey, userRecord.Verified())
 			return next(ctx, req)
 		}
 	}

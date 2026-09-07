@@ -36,69 +36,114 @@ func TestUserIDFromContext(t *testing.T) {
 	})
 }
 
+func TestUserVerifiedFromContext(t *testing.T) {
+	t.Run("empty context defaults false", func(t *testing.T) {
+		if got := UserVerifiedFromContext(context.Background()); got {
+			t.Error("expected false for empty context")
+		}
+	})
+
+	t.Run("with verified true", func(t *testing.T) {
+		ctx := context.WithValue(context.Background(), userVerifiedKey, true)
+		if got := UserVerifiedFromContext(ctx); !got {
+			t.Error("expected true")
+		}
+	})
+}
+
+func principalEntity(userID string, verified bool) cedar.Entity {
+	uid := cedar.EntityUID{Type: "Library::User", ID: cedar.String(userID)}
+	return cedar.Entity{
+		UID: uid,
+		Attributes: cedar.NewRecord(cedar.RecordMap{
+			"id":       cedar.String(userID),
+			"verified": cedar.Boolean(verified),
+		}),
+	}
+}
+
 func TestCedarAuthorization(t *testing.T) {
 	loadTestPolicies(t)
 
 	tests := []struct {
-		name       string
-		userID     string
-		action     string
-		bookID     string
-		bookAuthor string
-		bookStatus string
-		want       cedar.Decision
+		name         string
+		userID       string
+		userVerified bool
+		action       string
+		bookID       string
+		bookAuthor   string
+		bookStatus   string
+		want         cedar.Decision
 	}{
 		{
-			name:   "any user can create a book",
-			userID: "user1", action: "CreateBook",
+			name:         "verified user can create a book",
+			userID:       "user1", userVerified: true, action: "CreateBook",
 			bookID: "new-book", bookAuthor: "", bookStatus: "",
 			want: cedar.Allow,
 		},
 		{
-			name:   "any user can get a published book",
-			userID: "user2", action: "GetBook",
+			name:         "unverified user cannot create a book",
+			userID:       "user1", userVerified: false, action: "CreateBook",
+			bookID: "new-book", bookAuthor: "", bookStatus: "",
+			want: cedar.Deny,
+		},
+		{
+			name:         "any user can get a published book",
+			userID:       "user2", userVerified: false, action: "GetBook",
 			bookID: "published-book", bookAuthor: "user1", bookStatus: "published",
 			want: cedar.Allow,
 		},
 		{
-			name:   "author can get own draft",
-			userID: "user1", action: "GetBook",
+			name:         "author can get own draft",
+			userID:       "user1", userVerified: false, action: "GetBook",
 			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
 			want: cedar.Allow,
 		},
 		{
-			name:   "non-author cannot get someone else's draft",
-			userID: "user2", action: "GetBook",
+			name:         "non-author cannot get someone else's draft",
+			userID:       "user2", userVerified: true, action: "GetBook",
 			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
 			want: cedar.Deny,
 		},
 		{
-			name:   "any user can list books",
-			userID: "user1", action: "ListBooks",
+			name:         "any user can list books",
+			userID:       "user1", userVerified: false, action: "ListBooks",
 			bookID: "any-book", bookAuthor: "user1", bookStatus: "published",
 			want: cedar.Allow,
 		},
 		{
-			name:   "author can update own book",
-			userID: "user1", action: "UpdateBook",
+			name:         "verified author can update own book",
+			userID:       "user1", userVerified: true, action: "UpdateBook",
 			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
 			want: cedar.Allow,
 		},
 		{
-			name:   "non-author cannot update someone else's book",
-			userID: "user2", action: "UpdateBook",
+			name:         "unverified author cannot update own book",
+			userID:       "user1", userVerified: false, action: "UpdateBook",
 			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
 			want: cedar.Deny,
 		},
 		{
-			name:   "author can delete own book",
-			userID: "user1", action: "DeleteBook",
+			name:         "non-author cannot update someone else's book",
+			userID:       "user2", userVerified: true, action: "UpdateBook",
+			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
+			want: cedar.Deny,
+		},
+		{
+			name:         "verified author can delete own book",
+			userID:       "user1", userVerified: true, action: "DeleteBook",
 			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
 			want: cedar.Allow,
 		},
 		{
-			name:   "non-author cannot delete someone else's book",
-			userID: "user2", action: "DeleteBook",
+			name:         "unverified author cannot delete own book",
+			userID:       "user1", userVerified: false, action: "DeleteBook",
+			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
+			want: cedar.Deny,
+		},
+		{
+			name:         "non-author cannot delete someone else's book",
+			userID:       "user2", userVerified: true, action: "DeleteBook",
 			bookID: "draft-book", bookAuthor: "user1", bookStatus: "draft",
 			want: cedar.Deny,
 		},
@@ -110,13 +155,9 @@ func TestCedarAuthorization(t *testing.T) {
 			actionUID := cedar.EntityUID{Type: "Library::Action", ID: cedar.String(tt.action)}
 			resourceUID := cedar.EntityUID{Type: "Library::Book", ID: cedar.String(tt.bookID)}
 
+			pe := principalEntity(tt.userID, tt.userVerified)
 			entities := cedar.EntityMap{
-				principalUID: cedar.Entity{
-					UID: principalUID,
-					Attributes: cedar.NewRecord(cedar.RecordMap{
-						"id": cedar.String(tt.userID),
-					}),
-				},
+				principalUID: pe,
 				resourceUID: cedar.Entity{
 					UID: resourceUID,
 					Attributes: cedar.NewRecord(cedar.RecordMap{
@@ -144,65 +185,90 @@ func TestReviewAuthorization(t *testing.T) {
 	loadTestPolicies(t)
 
 	tests := []struct {
-		name       string
-		userID     string
-		action     string
-		reviewID   string
-		reviewer   string
-		bookAuthor string
-		want       cedar.Decision
+		name         string
+		userID       string
+		userVerified bool
+		action       string
+		reviewID     string
+		reviewer     string
+		bookAuthor   string
+		want         cedar.Decision
 	}{
 		{
-			name:   "any user can create a review on someone else's book",
-			userID: "user2", action: "CreateReview",
+			name:         "verified user can create a review on someone else's book",
+			userID:       "user2", userVerified: true, action: "CreateReview",
 			reviewID: "new-review", reviewer: "user2", bookAuthor: "user1",
 			want: cedar.Allow,
 		},
 		{
-			name:   "author cannot review own book",
-			userID: "user1", action: "CreateReview",
+			name:         "unverified user cannot create a review",
+			userID:       "user2", userVerified: false, action: "CreateReview",
+			reviewID: "new-review", reviewer: "user2", bookAuthor: "user1",
+			want: cedar.Deny,
+		},
+		{
+			name:         "author cannot review own book",
+			userID:       "user1", userVerified: true, action: "CreateReview",
 			reviewID: "self-review", reviewer: "user1", bookAuthor: "user1",
 			want: cedar.Deny,
 		},
 		{
-			name:   "any user can get a review",
-			userID: "user2", action: "GetReview",
+			name:         "any user can get a review",
+			userID:       "user2", userVerified: false, action: "GetReview",
 			reviewID: "review1", reviewer: "user1", bookAuthor: "user1",
 			want: cedar.Allow,
 		},
 		{
-			name:   "any user can list reviews",
-			userID: "user1", action: "ListReviews",
+			name:         "any user can list reviews",
+			userID:       "user1", userVerified: false, action: "ListReviews",
 			reviewID: "any-review", reviewer: "user2", bookAuthor: "user1",
 			want: cedar.Allow,
 		},
 		{
-			name:   "reviewer can update own review",
-			userID: "user2", action: "UpdateReview",
+			name:         "verified reviewer can update own review",
+			userID:       "user2", userVerified: true, action: "UpdateReview",
 			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
 			want: cedar.Allow,
 		},
 		{
-			name:   "non-reviewer cannot update review",
-			userID: "user1", action: "UpdateReview",
+			name:         "unverified reviewer cannot update own review",
+			userID:       "user2", userVerified: false, action: "UpdateReview",
 			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
 			want: cedar.Deny,
 		},
 		{
-			name:   "reviewer can delete own review",
-			userID: "user2", action: "DeleteReview",
+			name:         "non-reviewer cannot update review",
+			userID:       "user1", userVerified: true, action: "UpdateReview",
+			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
+			want: cedar.Deny,
+		},
+		{
+			name:         "verified reviewer can delete own review",
+			userID:       "user2", userVerified: true, action: "DeleteReview",
 			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
 			want: cedar.Allow,
 		},
 		{
-			name:   "book author can moderate (delete) review",
-			userID: "user1", action: "DeleteReview",
+			name:         "unverified reviewer cannot delete own review",
+			userID:       "user2", userVerified: false, action: "DeleteReview",
+			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
+			want: cedar.Deny,
+		},
+		{
+			name:         "verified book author can moderate (delete) review",
+			userID:       "user1", userVerified: true, action: "DeleteReview",
 			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
 			want: cedar.Allow,
 		},
 		{
-			name:   "unrelated user cannot delete review",
-			userID: "user3", action: "DeleteReview",
+			name:         "unverified book author cannot moderate review",
+			userID:       "user1", userVerified: false, action: "DeleteReview",
+			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
+			want: cedar.Deny,
+		},
+		{
+			name:         "unrelated user cannot delete review",
+			userID:       "user3", userVerified: true, action: "DeleteReview",
 			reviewID: "review1", reviewer: "user2", bookAuthor: "user1",
 			want: cedar.Deny,
 		},
@@ -214,13 +280,9 @@ func TestReviewAuthorization(t *testing.T) {
 			actionUID := cedar.EntityUID{Type: "Library::Action", ID: cedar.String(tt.action)}
 			resourceUID := cedar.EntityUID{Type: "Library::Review", ID: cedar.String(tt.reviewID)}
 
+			pe := principalEntity(tt.userID, tt.userVerified)
 			entities := cedar.EntityMap{
-				principalUID: cedar.Entity{
-					UID: principalUID,
-					Attributes: cedar.NewRecord(cedar.RecordMap{
-						"id": cedar.String(tt.userID),
-					}),
-				},
+				principalUID: pe,
 				resourceUID: cedar.Entity{
 					UID: resourceUID,
 					Attributes: cedar.NewRecord(cedar.RecordMap{
@@ -247,7 +309,7 @@ func TestReviewAuthorization(t *testing.T) {
 func TestAuthorize(t *testing.T) {
 	loadTestPolicies(t)
 
-	t.Run("allows book creation", func(t *testing.T) {
+	t.Run("verified user can create book", func(t *testing.T) {
 		resourceUID := cedar.EntityUID{Type: "Library::Book", ID: cedar.String("")}
 		entities := cedar.EntityMap{
 			resourceUID: cedar.Entity{
@@ -258,9 +320,24 @@ func TestAuthorize(t *testing.T) {
 				}),
 			},
 		}
-		err := Authorize("user1", "CreateBook", resourceUID, entities)
-		if err != nil {
+		if err := Authorize("user1", true, "CreateBook", resourceUID, entities); err != nil {
 			t.Errorf("expected allow, got error: %v", err)
+		}
+	})
+
+	t.Run("unverified user cannot create book", func(t *testing.T) {
+		resourceUID := cedar.EntityUID{Type: "Library::Book", ID: cedar.String("")}
+		entities := cedar.EntityMap{
+			resourceUID: cedar.Entity{
+				UID: resourceUID,
+				Attributes: cedar.NewRecord(cedar.RecordMap{
+					"author": cedar.String(""),
+					"status": cedar.String(""),
+				}),
+			},
+		}
+		if err := Authorize("user1", false, "CreateBook", resourceUID, entities); err == nil {
+			t.Error("expected deny for unverified user, got nil")
 		}
 	})
 
@@ -275,7 +352,7 @@ func TestAuthorize(t *testing.T) {
 				}),
 			},
 		}
-		err := Authorize("user2", "DeleteBook", resourceUID, entities)
+		err := Authorize("user2", true, "DeleteBook", resourceUID, entities)
 		if err == nil {
 			t.Error("expected deny, got nil")
 		}
@@ -286,7 +363,7 @@ func TestAuthorize(t *testing.T) {
 		}
 	})
 
-	t.Run("allows review moderation by book author", func(t *testing.T) {
+	t.Run("verified book author can moderate review", func(t *testing.T) {
 		resourceUID := cedar.EntityUID{Type: "Library::Review", ID: cedar.String("review1")}
 		entities := cedar.EntityMap{
 			resourceUID: cedar.Entity{
@@ -297,8 +374,7 @@ func TestAuthorize(t *testing.T) {
 				}),
 			},
 		}
-		err := Authorize("user1", "DeleteReview", resourceUID, entities)
-		if err != nil {
+		if err := Authorize("user1", true, "DeleteReview", resourceUID, entities); err != nil {
 			t.Errorf("expected allow, got error: %v", err)
 		}
 	})
@@ -314,8 +390,7 @@ func TestAuthorize(t *testing.T) {
 				}),
 			},
 		}
-		err := Authorize("user1", "CreateReview", resourceUID, entities)
-		if err == nil {
+		if err := Authorize("user1", true, "CreateReview", resourceUID, entities); err == nil {
 			t.Error("expected deny for self-review, got nil")
 		}
 	})

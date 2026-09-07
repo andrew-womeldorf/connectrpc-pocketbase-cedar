@@ -1,0 +1,19 @@
+{{define "title"}}Two-Factor Authentication — Library{{end}}
+
+{{define "body"}}
+<section>
+  <h1>Two-Factor Authentication</h1>
+  <p>An 8-digit code has been sent to your email address. Enter it below to complete login.</p>
+  <form method="POST" action="/mfa">
+    <input type="hidden" name="mfaId" value="{{.MFAId}}">
+    <input type="hidden" name="otpId" value="{{.OTPId}}">
+
+    <label for="code">One-Time Code</label>
+    <input type="text" id="code" name="code" required autofocus
+           inputmode="numeric" pattern="[0-9]{8}" maxlength="8"
+           placeholder="12345678">
+
+    <button type="submit">Verify</button>
+  </form>
+</section>
+{{end}}

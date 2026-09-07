@@ -28,6 +28,7 @@ func reviewEntities(reviewID, reviewer, bookAuthor string) (cedar.EntityUID, ced
 func (h *Handler) createReview(e *core.RequestEvent) error {
 	bookID := e.Request.PathValue("id")
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 
 	book, err := h.store.GetBook(e.Request.Context(), bookID)
 	if err != nil {
@@ -35,7 +36,7 @@ func (h *Handler) createReview(e *core.RequestEvent) error {
 	}
 
 	resourceUID, entities := reviewEntities("", userID, book.Author)
-	if err := authz.Authorize(userID, "CreateReview", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "CreateReview", resourceUID, entities); err != nil {
 		return e.Redirect(http.StatusFound, "/books/"+bookID)
 	}
 
@@ -62,6 +63,7 @@ func (h *Handler) createReview(e *core.RequestEvent) error {
 func (h *Handler) deleteReview(e *core.RequestEvent) error {
 	reviewID := e.Request.PathValue("id")
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 
 	review, err := h.store.GetReview(e.Request.Context(), reviewID)
 	if err != nil {
@@ -74,7 +76,7 @@ func (h *Handler) deleteReview(e *core.RequestEvent) error {
 	}
 
 	resourceUID, entities := reviewEntities(review.ID, review.Reviewer, book.Author)
-	if err := authz.Authorize(userID, "DeleteReview", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "DeleteReview", resourceUID, entities); err != nil {
 		return e.Redirect(http.StatusFound, "/books/"+review.BookID)
 	}
 

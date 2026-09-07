@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #MISE hide = true
 #MISE depends = ["proto:generate", "web:compress", "web:hash"]
-#MISE sources = ["**/*.go", "policies/*"]
+#MISE sources = ["**/*.{go,html}", "policies/*"]
 
 mkdir -p build
 go build -o build/cli main.go

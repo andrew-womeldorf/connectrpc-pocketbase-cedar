@@ -38,6 +38,7 @@ func reviewEntities(reviewID, reviewer, bookAuthor string) (cedar.EntityUID, ced
 
 func (s *Server) CreateReview(ctx context.Context, req *connect.Request[libraryv1.CreateReviewRequest]) (*connect.Response[libraryv1.CreateReviewResponse], error) {
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 
 	book, err := s.store.GetBook(ctx, req.Msg.GetBookId())
 	if err != nil {
@@ -45,7 +46,7 @@ func (s *Server) CreateReview(ctx context.Context, req *connect.Request[libraryv
 	}
 
 	resourceUID, entities := reviewEntities("", userID, book.Author)
-	if err := authz.Authorize(userID, "CreateReview", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "CreateReview", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -81,8 +82,9 @@ func (s *Server) GetReview(ctx context.Context, req *connect.Request[libraryv1.G
 	}
 
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 	resourceUID, entities := reviewEntities(review.ID, review.Reviewer, book.Author)
-	if err := authz.Authorize(userID, "GetReview", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "GetReview", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -93,9 +95,10 @@ func (s *Server) GetReview(ctx context.Context, req *connect.Request[libraryv1.G
 
 func (s *Server) ListReviews(ctx context.Context, req *connect.Request[libraryv1.ListReviewsRequest]) (*connect.Response[libraryv1.ListReviewsResponse], error) {
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 
 	resourceUID, entities := reviewEntities("", "", "")
-	if err := authz.Authorize(userID, "ListReviews", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "ListReviews", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -126,8 +129,9 @@ func (s *Server) UpdateReview(ctx context.Context, req *connect.Request[libraryv
 	}
 
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 	resourceUID, entities := reviewEntities(review.ID, review.Reviewer, book.Author)
-	if err := authz.Authorize(userID, "UpdateReview", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "UpdateReview", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -165,8 +169,9 @@ func (s *Server) DeleteReview(ctx context.Context, req *connect.Request[libraryv
 	}
 
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 	resourceUID, entities := reviewEntities(review.ID, review.Reviewer, book.Author)
-	if err := authz.Authorize(userID, "DeleteReview", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "DeleteReview", resourceUID, entities); err != nil {
 		return nil, err
 	}
 

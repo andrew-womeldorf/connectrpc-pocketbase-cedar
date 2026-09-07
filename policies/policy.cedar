@@ -3,7 +3,8 @@ permit (
   principal,
   action == Library::Action::"CreateBook",
   resource
-);
+)
+when { principal.verified };
 
 @id("allow-get-published-book")
 permit (
@@ -34,7 +35,7 @@ permit (
   action == Library::Action::"UpdateBook",
   resource
 )
-when { resource.author == principal.id };
+when { resource.author == principal.id && principal.verified };
 
 @id("allow-delete-own-book")
 permit (
@@ -42,14 +43,15 @@ permit (
   action == Library::Action::"DeleteBook",
   resource
 )
-when { resource.author == principal.id };
+when { resource.author == principal.id && principal.verified };
 
 @id("allow-create-review")
 permit (
   principal,
   action == Library::Action::"CreateReview",
   resource
-);
+)
+when { principal.verified };
 
 @id("forbid-self-review")
 forbid (
@@ -79,7 +81,7 @@ permit (
   action == Library::Action::"UpdateReview",
   resource
 )
-when { resource.reviewer == principal.id };
+when { resource.reviewer == principal.id && principal.verified };
 
 @id("allow-delete-own-review")
 permit (
@@ -87,7 +89,7 @@ permit (
   action == Library::Action::"DeleteReview",
   resource
 )
-when { resource.reviewer == principal.id };
+when { resource.reviewer == principal.id && principal.verified };
 
 @id("allow-moderate-review")
 permit (
@@ -95,4 +97,4 @@ permit (
   action == Library::Action::"DeleteReview",
   resource
 )
-when { resource.book_author == principal.id };
+when { resource.book_author == principal.id && principal.verified };

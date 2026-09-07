@@ -44,9 +44,10 @@ func bookEntities(bookID, bookAuthor, bookStatus string) (cedar.EntityUID, cedar
 
 func (h *Handler) listBooks(e *core.RequestEvent) error {
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 
 	resourceUID, entities := bookEntities("", "", "")
-	if err := authz.Authorize(userID, "ListBooks", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "ListBooks", resourceUID, entities); err != nil {
 		return e.Redirect(http.StatusFound, "/login")
 	}
 
@@ -69,6 +70,7 @@ func (h *Handler) listBooks(e *core.RequestEvent) error {
 func (h *Handler) showBook(e *core.RequestEvent) error {
 	id := e.Request.PathValue("id")
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 
 	book, err := h.store.GetBook(e.Request.Context(), id)
 	if err != nil {
@@ -76,7 +78,7 @@ func (h *Handler) showBook(e *core.RequestEvent) error {
 	}
 
 	resourceUID, entities := bookEntities(book.ID, book.Author, book.Status)
-	if err := authz.Authorize(userID, "GetBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "GetBook", resourceUID, entities); err != nil {
 		return e.NotFoundError("", nil)
 	}
 
@@ -121,10 +123,11 @@ func (h *Handler) newBook(e *core.RequestEvent) error {
 
 func (h *Handler) createBook(e *core.RequestEvent) error {
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 	title := e.Request.FormValue("title")
 
 	resourceUID, entities := bookEntities("", "", "")
-	if err := authz.Authorize(userID, "CreateBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "CreateBook", resourceUID, entities); err != nil {
 		return h.renderWithFlash(e, "book_form.html", "Not authorized.", nil)
 	}
 
@@ -160,6 +163,7 @@ func (h *Handler) editBook(e *core.RequestEvent) error {
 func (h *Handler) updateBook(e *core.RequestEvent) error {
 	id := e.Request.PathValue("id")
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 
 	book, err := h.store.GetBook(e.Request.Context(), id)
 	if err != nil {
@@ -167,7 +171,7 @@ func (h *Handler) updateBook(e *core.RequestEvent) error {
 	}
 
 	resourceUID, entities := bookEntities(book.ID, book.Author, book.Status)
-	if err := authz.Authorize(userID, "UpdateBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "UpdateBook", resourceUID, entities); err != nil {
 		return e.NotFoundError("", nil)
 	}
 
@@ -193,6 +197,7 @@ func (h *Handler) updateBook(e *core.RequestEvent) error {
 func (h *Handler) deleteBook(e *core.RequestEvent) error {
 	id := e.Request.PathValue("id")
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 
 	book, err := h.store.GetBook(e.Request.Context(), id)
 	if err != nil {
@@ -200,7 +205,7 @@ func (h *Handler) deleteBook(e *core.RequestEvent) error {
 	}
 
 	resourceUID, entities := bookEntities(book.ID, book.Author, book.Status)
-	if err := authz.Authorize(userID, "DeleteBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "DeleteBook", resourceUID, entities); err != nil {
 		return e.NotFoundError("", nil)
 	}
 
@@ -214,6 +219,7 @@ func (h *Handler) deleteBook(e *core.RequestEvent) error {
 func (h *Handler) publishBook(e *core.RequestEvent) error {
 	id := e.Request.PathValue("id")
 	userID := e.Get("userID").(string)
+	userVerified, _ := e.Get("userVerified").(bool)
 
 	book, err := h.store.GetBook(e.Request.Context(), id)
 	if err != nil {
@@ -221,7 +227,7 @@ func (h *Handler) publishBook(e *core.RequestEvent) error {
 	}
 
 	resourceUID, entities := bookEntities(book.ID, book.Author, book.Status)
-	if err := authz.Authorize(userID, "UpdateBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "UpdateBook", resourceUID, entities); err != nil {
 		return e.NotFoundError("", nil)
 	}
 

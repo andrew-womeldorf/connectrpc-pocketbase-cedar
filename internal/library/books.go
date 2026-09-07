@@ -36,9 +36,10 @@ func bookEntities(bookID, bookAuthor, bookStatus string) (cedar.EntityUID, cedar
 
 func (s *Server) CreateBook(ctx context.Context, req *connect.Request[libraryv1.CreateBookRequest]) (*connect.Response[libraryv1.CreateBookResponse], error) {
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 
 	resourceUID, entities := bookEntities("", "", "")
-	if err := authz.Authorize(userID, "CreateBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "CreateBook", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -63,8 +64,9 @@ func (s *Server) GetBook(ctx context.Context, req *connect.Request[libraryv1.Get
 	}
 
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 	resourceUID, entities := bookEntities(book.ID, book.Author, book.Status)
-	if err := authz.Authorize(userID, "GetBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "GetBook", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -75,9 +77,10 @@ func (s *Server) GetBook(ctx context.Context, req *connect.Request[libraryv1.Get
 
 func (s *Server) ListBooks(ctx context.Context, req *connect.Request[libraryv1.ListBooksRequest]) (*connect.Response[libraryv1.ListBooksResponse], error) {
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 
 	resourceUID, entities := bookEntities("", "", "")
-	if err := authz.Authorize(userID, "ListBooks", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "ListBooks", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -106,8 +109,9 @@ func (s *Server) UpdateBook(ctx context.Context, req *connect.Request[libraryv1.
 	}
 
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 	resourceUID, entities := bookEntities(book.ID, book.Author, book.Status)
-	if err := authz.Authorize(userID, "UpdateBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "UpdateBook", resourceUID, entities); err != nil {
 		return nil, err
 	}
 
@@ -136,8 +140,9 @@ func (s *Server) DeleteBook(ctx context.Context, req *connect.Request[libraryv1.
 	}
 
 	userID := authz.UserIDFromContext(ctx)
+	userVerified := authz.UserVerifiedFromContext(ctx)
 	resourceUID, entities := bookEntities(book.ID, book.Author, book.Status)
-	if err := authz.Authorize(userID, "DeleteBook", resourceUID, entities); err != nil {
+	if err := authz.Authorize(userID, userVerified, "DeleteBook", resourceUID, entities); err != nil {
 		return nil, err
 	}
 

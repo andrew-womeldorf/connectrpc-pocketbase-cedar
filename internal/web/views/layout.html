@@ -25,6 +25,9 @@
   </header>
 
   <main>
+    {{if and .UserID (not .UserVerified)}}
+      <div class="flash flash-warning">Your email is not verified. Most write actions are restricted until you verify. Check your inbox for a verification link.</div>
+    {{end}}
     {{if .Flash}}
       <div class="flash flash-error">{{.Flash}}</div>
     {{end}}
