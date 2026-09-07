@@ -1,3 +1,6 @@
 gen
 pb_data
 build
+*.gz
+*.br
+*.zst
