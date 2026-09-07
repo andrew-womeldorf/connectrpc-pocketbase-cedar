@@ -45,6 +45,9 @@ func RegisterRoutes(r *router.Router[*core.RequestEvent], app core.App, s store.
 	r.POST("/logout", h.logout)
 
 	auth := r.Group("").BindFunc(h.requireAuth)
+	auth.GET("/profile", h.profilePage)
+	auth.POST("/profile/name", h.updateName)
+	auth.POST("/profile/password", h.changePassword)
 	auth.GET("/books", h.listBooks)
 	auth.GET("/books/new", h.newBook)
 	auth.POST("/books/new", h.createBook)

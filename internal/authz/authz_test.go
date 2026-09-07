@@ -306,6 +306,75 @@ func TestReviewAuthorization(t *testing.T) {
 	}
 }
 
+func TestUserSelfAuthorization(t *testing.T) {
+	loadTestPolicies(t)
+
+	tests := []struct {
+		name     string
+		userID   string
+		action   string
+		resource string // entity ID of the resource user
+		want     cedar.Decision
+	}{
+		{
+			name: "user can get themselves",
+			userID: "user1", action: "GetMe", resource: "user1",
+			want: cedar.Allow,
+		},
+		{
+			name: "user cannot get another user",
+			userID: "user1", action: "GetMe", resource: "user2",
+			want: cedar.Deny,
+		},
+		{
+			name: "user can update themselves",
+			userID: "user1", action: "UpdateMe", resource: "user1",
+			want: cedar.Allow,
+		},
+		{
+			name: "user cannot update another user",
+			userID: "user1", action: "UpdateMe", resource: "user2",
+			want: cedar.Deny,
+		},
+		{
+			name: "unverified user can get themselves",
+			userID: "user1", action: "GetMe", resource: "user1",
+			want: cedar.Allow,
+		},
+		{
+			name: "unverified user can update themselves",
+			userID: "user1", action: "UpdateMe", resource: "user1",
+			want: cedar.Allow,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			principalUID := cedar.EntityUID{Type: "Library::User", ID: cedar.String(tt.userID)}
+			actionUID := cedar.EntityUID{Type: "Library::Action", ID: cedar.String(tt.action)}
+			resourceUID := cedar.EntityUID{Type: "Library::User", ID: cedar.String(tt.resource)}
+
+			// verified=false for unverified cases; the policy shouldn't require it
+			pe := principalEntity(tt.userID, false)
+			entities := cedar.EntityMap{
+				principalUID: pe,
+				resourceUID: cedar.Entity{UID: resourceUID},
+			}
+
+			req := cedar.Request{
+				Principal: principalUID,
+				Action:    actionUID,
+				Resource:  resourceUID,
+			}
+
+			got, _ := cedar.Authorize(policySet, entities, req)
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestAuthorize(t *testing.T) {
 	loadTestPolicies(t)
 

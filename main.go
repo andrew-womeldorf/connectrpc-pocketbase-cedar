@@ -39,7 +39,7 @@ func main() {
 		s := pbstore.New(app)
 
 		interceptors := connect.WithInterceptors(authz.Interceptor(app))
-		path, handler := libraryv1connect.NewLibraryServiceHandler(library.NewServer(s), interceptors)
+		path, handler := libraryv1connect.NewLibraryServiceHandler(library.NewServer(app, s), interceptors)
 
 		e.Router.Any(path+"{path...}", func(e *core.RequestEvent) error {
 			handler.ServeHTTP(e.Response, e.Request)

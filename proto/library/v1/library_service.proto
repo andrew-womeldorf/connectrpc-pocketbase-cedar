@@ -5,6 +5,9 @@ package library.v1;
 import "google/protobuf/timestamp.proto";
 
 service LibraryService {
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+  rpc UpdateMe(UpdateMeRequest) returns (UpdateMeResponse);
+
   rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
   rpc GetBook(GetBookRequest) returns (GetBookResponse);
   rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
@@ -16,6 +19,31 @@ service LibraryService {
   rpc ListReviews(ListReviewsRequest) returns (ListReviewsResponse);
   rpc UpdateReview(UpdateReviewRequest) returns (UpdateReviewResponse);
   rpc DeleteReview(DeleteReviewRequest) returns (DeleteReviewResponse);
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  bool verified = 4;
+}
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  User user = 1;
+}
+
+// Password fields are write-only and never returned in responses.
+message UpdateMeRequest {
+  optional string name = 1;
+  // current_password is required when new_password is provided.
+  optional string current_password = 2;
+  optional string new_password = 3;
+}
+
+message UpdateMeResponse {
+  User user = 1;
 }
 
 message Book {

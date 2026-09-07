@@ -1,3 +1,19 @@
+@id("allow-get-me")
+permit (
+  principal,
+  action == Library::Action::"GetMe",
+  resource
+)
+when { resource == principal };
+
+@id("allow-update-me")
+permit (
+  principal,
+  action == Library::Action::"UpdateMe",
+  resource
+)
+when { resource == principal };
+
 @id("allow-create-book")
 permit (
   principal,

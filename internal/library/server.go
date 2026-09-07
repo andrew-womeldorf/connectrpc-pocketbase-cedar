@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"connectrpc.com/connect"
+	"github.com/pocketbase/pocketbase/core"
 
 	"github.com/andrew-womeldorf/pbtest/gen/library/v1/libraryv1connect"
 	"github.com/andrew-womeldorf/pbtest/internal/store"
@@ -12,11 +13,12 @@ import (
 var _ libraryv1connect.LibraryServiceHandler = (*Server)(nil)
 
 type Server struct {
+	app   core.App
 	store store.Store
 }
 
-func NewServer(s store.Store) *Server {
-	return &Server{store: s}
+func NewServer(app core.App, s store.Store) *Server {
+	return &Server{app: app, store: s}
 }
 
 func storeErr(err error) error {
