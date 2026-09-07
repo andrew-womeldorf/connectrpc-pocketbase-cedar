@@ -1,4 +1,4 @@
-# pbtest
+# Exprimenting with ConnectRPC, Pocketbase, and Cedar
 
 An experiment combining [PocketBase](https://pocketbase.io/) as an embedded backend with [ConnectRPC](https://connectrpc.com/) services, using [Cedar](https://www.cedarpolicy.com/) for authorization.
 
