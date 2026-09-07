@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"embed"
 	"html/template"
-	"io/fs"
+	"mime"
 	"net/http"
+	"path"
 	"strings"
 
 	"github.com/pocketbase/pocketbase/core"
@@ -28,11 +29,7 @@ type Handler struct {
 func RegisterRoutes(r *router.Router[*core.RequestEvent], app core.App, s store.Store) {
 	h := &Handler{app: app, store: s}
 
-	staticDir, _ := fs.Sub(staticFS, "static")
-	r.GET("/static/{path...}", func(e *core.RequestEvent) error {
-		http.StripPrefix("/static/", http.FileServer(http.FS(staticDir))).ServeHTTP(e.Response, e.Request)
-		return nil
-	})
+	r.GET("/static/{path...}", serveStatic)
 
 	r.GET("/login", h.loginPage)
 	r.POST("/login", h.loginSubmit)
@@ -126,4 +123,59 @@ func (h *Handler) userName(id string) string {
 		return record.GetString("email")
 	}
 	return name
+}
+
+var encodings = []struct {
+	name string
+	ext  string
+}{
+	{"br", ".br"},
+	{"zstd", ".zst"},
+	{"gzip", ".gz"},
+}
+
+func serveStatic(e *core.RequestEvent) error {
+	reqPath := path.Clean(e.Request.PathValue("path"))
+	if reqPath == "" || reqPath == "." || strings.HasPrefix(reqPath, "..") {
+		return e.NotFoundError("", nil)
+	}
+
+	accept := e.Request.Header.Get("Accept-Encoding")
+	contentType := mime.TypeByExtension(path.Ext(reqPath))
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
+	for _, enc := range encodings {
+		if !acceptsEncoding(accept, enc.name) {
+			continue
+		}
+		data, err := staticFS.ReadFile("static/" + reqPath + enc.ext)
+		if err != nil {
+			continue
+		}
+		e.Response.Header().Set("Content-Encoding", enc.name)
+		e.Response.Header().Set("Content-Type", contentType)
+		e.Response.Header().Set("Vary", "Accept-Encoding")
+		_, _ = e.Response.Write(data)
+		return nil
+	}
+
+	data, err := staticFS.ReadFile("static/" + reqPath)
+	if err != nil {
+		return e.NotFoundError("", nil)
+	}
+	e.Response.Header().Set("Content-Type", contentType)
+	e.Response.Header().Set("Vary", "Accept-Encoding")
+	_, _ = e.Response.Write(data)
+	return nil
+}
+
+func acceptsEncoding(header, encoding string) bool {
+	for _, part := range strings.Split(header, ",") {
+		if strings.TrimSpace(strings.SplitN(part, ";", 2)[0]) == encoding {
+			return true
+		}
+	}
+	return false
 }
