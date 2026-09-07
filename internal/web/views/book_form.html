@@ -1,0 +1,28 @@
+{{define "title"}}{{if .Book}}Edit Book{{else}}New Book{{end}} — Library{{end}}
+
+{{define "body"}}
+<section>
+  <h1>{{if .Book}}Edit Book{{else}}New Book{{end}}</h1>
+  <form method="POST" action="{{if .Book}}/books/{{.Book.ID}}/edit{{else}}/books/new{{end}}">
+    <fieldset>
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" required autofocus value="{{if .Book}}{{.Book.Title}}{{end}}">
+
+      {{if .Book}}
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="draft" {{if eq .Book.Status "draft"}}selected{{end}}>Draft</option>
+        <option value="published" {{if eq .Book.Status "published"}}selected{{end}}>Published</option>
+      </select>
+      {{end}}
+    </fieldset>
+
+    <button type="submit">{{if .Book}}Save{{else}}Create{{end}}</button>
+    {{if .Book}}
+      <a href="/books/{{.Book.ID}}">Cancel</a>
+    {{else}}
+      <a href="/books">Cancel</a>
+    {{end}}
+  </form>
+</section>
+{{end}}

@@ -1,0 +1,17 @@
+{{define "title"}}Login — Library{{end}}
+
+{{define "body"}}
+<section>
+  <h1>Login</h1>
+  <form method="POST" action="/login">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required autofocus>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required>
+
+    <button type="submit">Login</button>
+  </form>
+  <p>Don't have an account? <a href="/register">Register</a></p>
+</section>
+{{end}}

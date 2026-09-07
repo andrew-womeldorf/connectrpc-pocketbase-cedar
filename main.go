@@ -16,6 +16,7 @@ import (
 	"github.com/andrew-womeldorf/pbtest/internal/authz"
 	"github.com/andrew-womeldorf/pbtest/internal/library"
 	"github.com/andrew-womeldorf/pbtest/internal/store/pbstore"
+	"github.com/andrew-womeldorf/pbtest/internal/web"
 
 	_ "github.com/andrew-womeldorf/pbtest/migrations"
 )
@@ -35,13 +36,17 @@ func main() {
 	})
 
 	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
+		s := pbstore.New(app)
+
 		interceptors := connect.WithInterceptors(authz.Interceptor(app))
-		path, handler := libraryv1connect.NewLibraryServiceHandler(library.NewServer(pbstore.New(app)), interceptors)
+		path, handler := libraryv1connect.NewLibraryServiceHandler(library.NewServer(s), interceptors)
 
 		e.Router.Any(path+"{path...}", func(e *core.RequestEvent) error {
 			handler.ServeHTTP(e.Response, e.Request)
 			return nil
 		})
+
+		web.RegisterRoutes(e.Router, app, s)
 
 		return e.Next()
 	})

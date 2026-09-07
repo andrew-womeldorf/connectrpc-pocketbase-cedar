@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{block "title" .}}Library{{end}}</title>
+  <link rel="stylesheet" href="/static/mu.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/books"><strong>Library</strong></a>
+      {{if .UserID}}
+        <a href="/books">Books</a>
+        <a href="/books/new">New Book</a>
+        <form method="POST" action="/logout">
+          <button type="submit">Logout</button>
+        </form>
+      {{else}}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+      {{end}}
+    </nav>
+  </header>
+
+  <main>
+    {{if .Flash}}
+      <div class="flash flash-error">{{.Flash}}</div>
+    {{end}}
+    {{if .Success}}
+      <div class="flash flash-success">{{.Success}}</div>
+    {{end}}
+    {{block "body" .}}{{end}}
+  </main>
+
+  <footer>
+    <small>Library — a PocketBase + Cedar demo</small>
+  </footer>
+</body>
+</html>

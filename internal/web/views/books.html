@@ -1,0 +1,20 @@
+{{define "title"}}Books — Library{{end}}
+
+{{define "body"}}
+<section>
+  <h1>Books</h1>
+  {{if .Books}}
+    {{range .Books}}
+    <article>
+      <h3><a href="/books/{{.ID}}">{{.Title}}</a></h3>
+      <p>
+        By {{.AuthorName}}
+        <span class="status-badge status-{{.Status}}">{{.Status}}</span>
+      </p>
+    </article>
+    {{end}}
+  {{else}}
+    <p>No books yet. <a href="/books/new">Create one</a>.</p>
+  {{end}}
+</section>
+{{end}}

@@ -1,0 +1,70 @@
+{{define "title"}}{{.Book.Title}} — Library{{end}}
+
+{{define "body"}}
+<article>
+  <header>
+    <h1>{{.Book.Title}}</h1>
+    <p>
+      By {{.Book.AuthorName}}
+      <span class="status-badge status-{{.Book.Status}}">{{.Book.Status}}</span>
+    </p>
+  </header>
+
+  {{if .IsOwner}}
+  <div class="actions">
+    <a href="/books/{{.Book.ID}}/edit">Edit</a>
+    {{if eq .Book.Status "draft"}}
+    <form method="POST" action="/books/{{.Book.ID}}/publish">
+      <button type="submit">Publish</button>
+    </form>
+    {{end}}
+    <form method="POST" action="/books/{{.Book.ID}}/delete" onsubmit="return confirm('Delete this book?')">
+      <button type="submit" class="danger">Delete</button>
+    </form>
+  </div>
+  {{end}}
+</article>
+
+<section>
+  <h2>Reviews</h2>
+
+  {{if .Reviews}}
+    {{range .Reviews}}
+    <article>
+      <p>
+        <span class="rating">{{stars .Rating}}</span>
+        <small>by {{.ReviewerName}}</small>
+      </p>
+      <p>{{.Content}}</p>
+      {{if .CanDelete}}
+      <form method="POST" action="/reviews/{{.ID}}/delete" onsubmit="return confirm('Delete this review?')">
+        <button type="submit" class="danger">Delete</button>
+      </form>
+      {{end}}
+    </article>
+    {{end}}
+  {{else}}
+    <p>No reviews yet.</p>
+  {{end}}
+
+  {{if .CanReview}}
+  <h3>Write a Review</h3>
+  <form method="POST" action="/books/{{.Book.ID}}/reviews">
+    <label for="rating">Rating</label>
+    <select id="rating" name="rating" required>
+      <option value="">—</option>
+      <option value="5">5</option>
+      <option value="4">4</option>
+      <option value="3">3</option>
+      <option value="2">2</option>
+      <option value="1">1</option>
+    </select>
+
+    <label for="content">Review</label>
+    <textarea id="content" name="content" rows="4" required></textarea>
+
+    <button type="submit">Submit Review</button>
+  </form>
+  {{end}}
+</section>
+{{end}}

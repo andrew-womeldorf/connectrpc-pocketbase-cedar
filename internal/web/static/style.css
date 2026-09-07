@@ -1,0 +1,74 @@
+nav form {
+  display: inline;
+}
+
+nav form button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.flash {
+  padding: 0.75em 1em;
+  border-radius: 4px;
+  margin-bottom: 1em;
+}
+
+.flash-error {
+  background: var(--mu-color-red-100, #fee2e2);
+  color: var(--mu-color-red-800, #991b1b);
+  border: 1px solid var(--mu-color-red-300, #fca5a5);
+}
+
+.flash-success {
+  background: var(--mu-color-green-100, #dcfce7);
+  color: var(--mu-color-green-800, #166534);
+  border: 1px solid var(--mu-color-green-300, #86efac);
+}
+
+.status-badge {
+  display: inline-block;
+  font-size: 0.8em;
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.status-draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-published {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.rating {
+  color: #f59e0b;
+  letter-spacing: 0.1em;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actions form {
+  display: inline;
+}
+
+.danger {
+  color: #dc2626;
+}
+
+article + article {
+  border-top: 1px solid var(--mu-border-color, #e5e7eb);
+  padding-top: 1em;
+}
