@@ -53,7 +53,7 @@ func Authorize(userID, action string, resourceUID cedar.EntityUID, entities ceda
 	}
 
 	slog.Info("cedar authz", slog.Any("request", req), slog.Any("entities", entities))
-	decision, diagnostic := policySet.IsAuthorized(entities, req)
+	decision, diagnostic := cedar.Authorize(policySet, entities, req)
 	slog.Info("cedar decision", slog.Any("decision", decision), slog.Any("diagnostic", diagnostic))
 
 	if decision != cedar.Allow {

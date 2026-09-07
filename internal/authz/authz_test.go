@@ -132,7 +132,7 @@ func TestCedarAuthorization(t *testing.T) {
 				Resource:  resourceUID,
 			}
 
-			got, _ := policySet.IsAuthorized(entities, req)
+			got, _ := cedar.Authorize(policySet, entities, req)
 			if got != tt.want {
 				t.Errorf("got %v, want %v", got, tt.want)
 			}
@@ -236,7 +236,7 @@ func TestReviewAuthorization(t *testing.T) {
 				Resource:  resourceUID,
 			}
 
-			got, _ := policySet.IsAuthorized(entities, req)
+			got, _ := cedar.Authorize(policySet, entities, req)
 			if got != tt.want {
 				t.Errorf("got %v, want %v", got, tt.want)
 			}
