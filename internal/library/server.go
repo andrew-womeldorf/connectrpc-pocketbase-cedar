@@ -5,8 +5,8 @@ import (
 
 	"connectrpc.com/connect"
 
-	"gitlab.com/andrew.womeldorf/pbtest/gen/library/v1/libraryv1connect"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store"
+	"github.com/andrew-womeldorf/pbtest/gen/library/v1/libraryv1connect"
+	"github.com/andrew-womeldorf/pbtest/internal/store"
 )
 
 var _ libraryv1connect.LibraryServiceHandler = (*Server)(nil)

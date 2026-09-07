@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store"
+	"github.com/andrew-womeldorf/pbtest/internal/store"
 )
 
 type Store struct {

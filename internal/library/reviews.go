@@ -7,9 +7,9 @@ import (
 	"connectrpc.com/connect"
 	"github.com/cedar-policy/cedar-go"
 
-	libraryv1 "gitlab.com/andrew.womeldorf/pbtest/gen/library/v1"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/authz"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store"
+	libraryv1 "github.com/andrew-womeldorf/pbtest/gen/library/v1"
+	"github.com/andrew-womeldorf/pbtest/internal/authz"
+	"github.com/andrew-womeldorf/pbtest/internal/store"
 )
 
 func reviewToProto(r *store.Review) *libraryv1.Review {

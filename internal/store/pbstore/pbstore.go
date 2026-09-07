@@ -6,7 +6,7 @@ import (
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store"
+	"github.com/andrew-womeldorf/pbtest/internal/store"
 )
 
 type Store struct {

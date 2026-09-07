@@ -12,12 +12,12 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"github.com/pocketbase/pocketbase/tools/osutils"
 
-	"gitlab.com/andrew.womeldorf/pbtest/gen/library/v1/libraryv1connect"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/authz"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/library"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store/pbstore"
+	"github.com/andrew-womeldorf/pbtest/gen/library/v1/libraryv1connect"
+	"github.com/andrew-womeldorf/pbtest/internal/authz"
+	"github.com/andrew-womeldorf/pbtest/internal/library"
+	"github.com/andrew-womeldorf/pbtest/internal/store/pbstore"
 
-	_ "gitlab.com/andrew.womeldorf/pbtest/migrations"
+	_ "github.com/andrew-womeldorf/pbtest/migrations"
 )
 
 //go:embed policies/policy.cedar

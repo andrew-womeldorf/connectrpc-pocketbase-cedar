@@ -8,11 +8,11 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tests"
 
-	_ "gitlab.com/andrew.womeldorf/pbtest/migrations"
+	_ "github.com/andrew-womeldorf/pbtest/migrations"
 
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store/memory"
-	"gitlab.com/andrew.womeldorf/pbtest/internal/store/pbstore"
+	"github.com/andrew-womeldorf/pbtest/internal/store"
+	"github.com/andrew-womeldorf/pbtest/internal/store/memory"
+	"github.com/andrew-womeldorf/pbtest/internal/store/pbstore"
 )
 
 type testEnv struct {

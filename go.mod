@@ -1,4 +1,4 @@
-module gitlab.com/andrew.womeldorf/pbtest
+module github.com/andrew-womeldorf/pbtest
 
 go 1.27
 
