@@ -15,6 +15,7 @@ import (
 	"gitlab.com/andrew.womeldorf/pbtest/gen/library/v1/libraryv1connect"
 	"gitlab.com/andrew.womeldorf/pbtest/internal/authz"
 	"gitlab.com/andrew.womeldorf/pbtest/internal/library"
+	"gitlab.com/andrew.womeldorf/pbtest/internal/store/pbstore"
 
 	_ "gitlab.com/andrew.womeldorf/pbtest/migrations"
 )
@@ -35,7 +36,7 @@ func main() {
 
 	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
 		interceptors := connect.WithInterceptors(authz.Interceptor(app))
-		path, handler := libraryv1connect.NewLibraryServiceHandler(library.NewServer(app), interceptors)
+		path, handler := libraryv1connect.NewLibraryServiceHandler(library.NewServer(pbstore.New(app)), interceptors)
 
 		e.Router.Any(path+"{path...}", func(e *core.RequestEvent) error {
 			handler.ServeHTTP(e.Response, e.Request)
