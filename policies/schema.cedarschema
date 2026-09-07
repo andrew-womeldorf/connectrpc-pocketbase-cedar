@@ -1,43 +1,45 @@
-entity User {
-    id: String,
-};
+namespace Library {
+    entity User {
+        id: String,
+    };
 
-entity Book {
-    author: String,
-    status: String,
-};
+    entity Book {
+        author: String,
+        status: String,
+    };
 
-action "CreateBook"
-    appliesTo { principal: [User], resource: [Book] };
+    action "CreateBook"
+        appliesTo { principal: [User], resource: [Book] };
 
-action "GetBook"
-    appliesTo { principal: [User], resource: [Book] };
+    action "GetBook"
+        appliesTo { principal: [User], resource: [Book] };
 
-action "ListBooks"
-    appliesTo { principal: [User], resource: [Book] };
+    action "ListBooks"
+        appliesTo { principal: [User], resource: [Book] };
 
-action "UpdateBook"
-    appliesTo { principal: [User], resource: [Book] };
+    action "UpdateBook"
+        appliesTo { principal: [User], resource: [Book] };
 
-action "DeleteBook"
-    appliesTo { principal: [User], resource: [Book] };
+    action "DeleteBook"
+        appliesTo { principal: [User], resource: [Book] };
 
-entity Review {
-    reviewer: String,
-    book_author: String,
-};
+    entity Review {
+        reviewer: String,
+        book_author: String,
+    };
 
-action "CreateReview"
-    appliesTo { principal: [User], resource: [Review] };
+    action "CreateReview"
+        appliesTo { principal: [User], resource: [Review] };
 
-action "GetReview"
-    appliesTo { principal: [User], resource: [Review] };
+    action "GetReview"
+        appliesTo { principal: [User], resource: [Review] };
 
-action "ListReviews"
-    appliesTo { principal: [User], resource: [Review] };
+    action "ListReviews"
+        appliesTo { principal: [User], resource: [Review] };
 
-action "UpdateReview"
-    appliesTo { principal: [User], resource: [Review] };
+    action "UpdateReview"
+        appliesTo { principal: [User], resource: [Review] };
 
-action "DeleteReview"
-    appliesTo { principal: [User], resource: [Review] };
+    action "DeleteReview"
+        appliesTo { principal: [User], resource: [Review] };
+}

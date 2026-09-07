@@ -23,7 +23,7 @@ func reviewToProto(r *store.Review) *libraryv1.Review {
 }
 
 func reviewEntities(reviewID, reviewer, bookAuthor string) (cedar.EntityUID, cedar.EntityMap) {
-	resourceUID := cedar.EntityUID{Type: "Review", ID: cedar.String(reviewID)}
+	resourceUID := cedar.EntityUID{Type: "Library::Review", ID: cedar.String(reviewID)}
 	entities := cedar.EntityMap{
 		resourceUID: cedar.Entity{
 			UID: resourceUID,

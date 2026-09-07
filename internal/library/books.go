@@ -21,7 +21,7 @@ func bookToProto(b *store.Book) *libraryv1.Book {
 }
 
 func bookEntities(bookID, bookAuthor, bookStatus string) (cedar.EntityUID, cedar.EntityMap) {
-	resourceUID := cedar.EntityUID{Type: "Book", ID: cedar.String(bookID)}
+	resourceUID := cedar.EntityUID{Type: "Library::Book", ID: cedar.String(bookID)}
 	entities := cedar.EntityMap{
 		resourceUID: cedar.Entity{
 			UID: resourceUID,

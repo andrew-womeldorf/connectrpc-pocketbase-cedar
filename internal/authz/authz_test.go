@@ -106,9 +106,9 @@ func TestCedarAuthorization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			principalUID := cedar.EntityUID{Type: "User", ID: cedar.String(tt.userID)}
-			actionUID := cedar.EntityUID{Type: "Action", ID: cedar.String(tt.action)}
-			resourceUID := cedar.EntityUID{Type: "Book", ID: cedar.String(tt.bookID)}
+			principalUID := cedar.EntityUID{Type: "Library::User", ID: cedar.String(tt.userID)}
+			actionUID := cedar.EntityUID{Type: "Library::Action", ID: cedar.String(tt.action)}
+			resourceUID := cedar.EntityUID{Type: "Library::Book", ID: cedar.String(tt.bookID)}
 
 			entities := cedar.EntityMap{
 				principalUID: cedar.Entity{
@@ -210,9 +210,9 @@ func TestReviewAuthorization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			principalUID := cedar.EntityUID{Type: "User", ID: cedar.String(tt.userID)}
-			actionUID := cedar.EntityUID{Type: "Action", ID: cedar.String(tt.action)}
-			resourceUID := cedar.EntityUID{Type: "Review", ID: cedar.String(tt.reviewID)}
+			principalUID := cedar.EntityUID{Type: "Library::User", ID: cedar.String(tt.userID)}
+			actionUID := cedar.EntityUID{Type: "Library::Action", ID: cedar.String(tt.action)}
+			resourceUID := cedar.EntityUID{Type: "Library::Review", ID: cedar.String(tt.reviewID)}
 
 			entities := cedar.EntityMap{
 				principalUID: cedar.Entity{
@@ -248,7 +248,7 @@ func TestAuthorize(t *testing.T) {
 	loadTestPolicies(t)
 
 	t.Run("allows book creation", func(t *testing.T) {
-		resourceUID := cedar.EntityUID{Type: "Book", ID: cedar.String("")}
+		resourceUID := cedar.EntityUID{Type: "Library::Book", ID: cedar.String("")}
 		entities := cedar.EntityMap{
 			resourceUID: cedar.Entity{
 				UID: resourceUID,
@@ -265,7 +265,7 @@ func TestAuthorize(t *testing.T) {
 	})
 
 	t.Run("denies unauthorized book delete", func(t *testing.T) {
-		resourceUID := cedar.EntityUID{Type: "Book", ID: cedar.String("book1")}
+		resourceUID := cedar.EntityUID{Type: "Library::Book", ID: cedar.String("book1")}
 		entities := cedar.EntityMap{
 			resourceUID: cedar.Entity{
 				UID: resourceUID,
@@ -287,7 +287,7 @@ func TestAuthorize(t *testing.T) {
 	})
 
 	t.Run("allows review moderation by book author", func(t *testing.T) {
-		resourceUID := cedar.EntityUID{Type: "Review", ID: cedar.String("review1")}
+		resourceUID := cedar.EntityUID{Type: "Library::Review", ID: cedar.String("review1")}
 		entities := cedar.EntityMap{
 			resourceUID: cedar.Entity{
 				UID: resourceUID,
@@ -304,7 +304,7 @@ func TestAuthorize(t *testing.T) {
 	})
 
 	t.Run("denies self-review", func(t *testing.T) {
-		resourceUID := cedar.EntityUID{Type: "Review", ID: cedar.String("")}
+		resourceUID := cedar.EntityUID{Type: "Library::Review", ID: cedar.String("")}
 		entities := cedar.EntityMap{
 			resourceUID: cedar.Entity{
 				UID: resourceUID,

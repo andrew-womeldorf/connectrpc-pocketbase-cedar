@@ -37,7 +37,7 @@ func UserIDFromContext(ctx context.Context) string {
 }
 
 func Authorize(userID, action string, resourceUID cedar.EntityUID, entities cedar.EntityMap) error {
-	principalUID := cedar.EntityUID{Type: "User", ID: cedar.String(userID)}
+	principalUID := cedar.EntityUID{Type: "Library::User", ID: cedar.String(userID)}
 
 	entities[principalUID] = cedar.Entity{
 		UID: principalUID,
@@ -48,7 +48,7 @@ func Authorize(userID, action string, resourceUID cedar.EntityUID, entities ceda
 
 	req := cedar.Request{
 		Principal: principalUID,
-		Action:    cedar.EntityUID{Type: "Action", ID: cedar.String(action)},
+		Action:    cedar.EntityUID{Type: "Library::Action", ID: cedar.String(action)},
 		Resource:  resourceUID,
 	}
 
