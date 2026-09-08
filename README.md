@@ -119,6 +119,50 @@ This is up to pocketbase to do...
 
 yep, we did it.
 
+### Transmit Passwords Only Over TLS or Other Strong Transport
+
+not related to pocketbase or the app. that's a deployment problem.
+
+### Require Re-authentication for Sensitive Features
+
+TODO: I think this is a good idea when we begin to allow other credentials, like api tokens, or when changing email addresses.
+
+### Re-authentication After Risk Events
+
+this requires noticing risk events, which is beyond the scope of the project.
+
+### Consider Strong Transaction Authentication
+
+this is a deployment problem
+
+### Authentication and Error Messages
+
+TODO
+
+### Protect Against Automated Attacks
+
+TODO
+
+### Logging and Monitoring
+
+TODO
+
+### Use of authentication protocols that require no password
+
+TODO
+
+### Password Managers
+
+TODO
+
+### Changing A User's Registered Email Address
+
+TODO
+
+### Adaptive or Risk Based Authentication
+
+TODO
+
 ## Password Storage Cheat Sheet
 
 https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
